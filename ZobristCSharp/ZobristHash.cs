@@ -443,11 +443,14 @@ namespace ZobristCSharp
             while ((p < fen.Length) && (fen[p] == ' ' || fen[p] == '-')) p++;
 
             ///////////////////////////////////////////////////////////////////
-            /// Ply                                                         ///
+            /// Fifty draw rule                                             ///
             ///////////////////////////////////////////////////////////////////
             if (p < fen.Length && NUMBERS.Contains(fen[p]))
             {
-                int ply = System.Convert.ToInt16(fen[p].ToString());
+                // The number of moves since a capture or pawn move,
+                // used to handle the fifty move draw rule.
+                // Not used yet.
+                int fiftyDrawRule = System.Convert.ToInt16(fen[p].ToString());
                 p++;
             }
 
@@ -459,7 +462,8 @@ namespace ZobristCSharp
             ///////////////////////////////////////////////////////////////////
             if (p < fen.Length && NUMBERS.Contains(fen[p]))
             {
-                int move = System.Convert.ToInt16(fen[p].ToString());
+                // Not used yet.
+                int moves = System.Convert.ToInt16(fen[p].ToString());
             }
 
             return key;
