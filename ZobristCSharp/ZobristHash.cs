@@ -268,12 +268,99 @@ namespace ZobristCSharp
         *   white king   11
         */
 
-        // Update to more robust implementation.
 
+        // Get more detail information about the Hashing.
+        public class Report
+        {
+            public System.UInt64 hash = 0;
+            public int fiftyDrawRule = 0;
+            public int moves = 0;
+            public char[,] board = null;
+            public List<string> errorsText = new List<string>();
+            public int err = 0;
+            public string turn = ""; 
+
+            public Report()
+            {
+
+            }
+
+            public override string ToString()
+            {
+                return BoardAsText(-1, -1, true);
+            }
+
+            /// <summary>
+            /// Display the information generated when converting
+            /// the FEN to a Hash. Inlucding the board loayout.
+            /// 
+            /// If error(s) are reported then check the errorsText List,
+            /// as the board may not be valid.
+            /// 
+            /// fileShow and rankShow can be used to highlight a square on the board.
+            /// 
+            /// For basic version of this function use ToString()
+            /// </summary>
+            /// <param name="fileShow"></param>
+            /// <param name="rankshow"></param>
+            /// <param name="humanReadable"></param>
+            /// <returns>string Board layout and info</returns>
+            public string BoardAsText(
+                int fileShow,
+                int rankShow,
+                bool humanReadable = false)
+            {
+                string textboard = "";
+                textboard += "turn = " + turn + " | ";
+                textboard += "fiftyDrawRule = " + fiftyDrawRule + " | ";
+                textboard += "moves = " + moves + "\n";
+
+                for (int f = 0; f <= 7; f++)
+                {
+                    textboard += "\t";
+
+                    for (int r = 0; r <= 7; r++)
+                    {
+                        // Normal user view is board[r, 7-f]
+
+                        if (fileShow == f && rankShow == r)
+                        {
+                            textboard += "[" + ((!humanReadable) ? board[f, r] : board[r, 7 - f]) + ">";
+                        }
+                        else
+                        {
+                            textboard += "[" + ((!humanReadable) ? board[f, r] : board[r, 7 - f]) + "]";
+                        }
+                    }
+                    textboard += "\n";
+                }
+
+                if (errorsText.Count > 0 || err != 0)
+                    textboard += "\t*** Board has error(s) ****\n";
+
+                return textboard;
+            }
+        }
+
+        // Update to more robust implementation.
         public static System.UInt64 GetHash(string fen)
         {
-            string toMove = "";
-            char[,] board = new char[8, 8];
+            Report report = GetHashExtend(fen);
+            System.UInt64 hash = report.hash;
+            report = null; // Garbage collect ready.
+            return hash;
+        }
+
+        public static Report GetHashWithReport(string fen, bool strict = false)
+        {
+            Report rep = GetHashExtend(fen, strict);
+            return rep;
+        }
+
+        private static Report GetHashExtend(string fen, bool strict = false)
+        {
+            Report report = new Report();
+            report.board = new char[8, 8];
             char c;
 
             int p = 0, r = 7, f = 0, i, kindOfPpiece;
@@ -311,19 +398,24 @@ namespace ZobristCSharp
                 {
                     for (i = 0; i <= c - '1'; i++)
                     {
-                        board[f++, r] = '-';
+                        report.board[f++, r] = '-';
                     }
                 }
                 else
                 {
-                    board[f++, r] = c;
+                    report.board[f++, r] = c;
                 }
                 p++;
             }
 
             if(p < MIN_FEN_BOARD_DATA || hasKings < 2)
             {
-                return 0;
+                report.err = 1;
+                if (p < MIN_FEN_BOARD_DATA)
+                    report.errorsText.Add("Less than minimum " + MIN_FEN_BOARD_DATA + "character in the FEN board layout data.");
+                if (hasKings < 2)
+                    report.errorsText.Add("Missing king(s)");
+                return report;
             }
 
             // Hash pieces based on board locations
@@ -332,7 +424,7 @@ namespace ZobristCSharp
             {
                 for (r = 0; r <= 7; r++)
                 {
-                    c = board[f, r];
+                    c = report.board[f, r];
 
                     if (c != '-')
                     {
@@ -355,9 +447,14 @@ namespace ZobristCSharp
             /// Find which players turn it is. This get hashed at the end.  ///
             ///////////////////////////////////////////////////////////////////
             if ((p < fen.Length) && (fen[p] == 'w' || fen[p] == 'b'))
-            { 
-                toMove = fen[p].ToString();
+            {
+                report.turn = fen[p].ToString();
                 p += 1;
+            } 
+            else if(strict)
+            {
+                report.err++;
+                report.errorsText.Add("Missing turn data..");
             }
 
             // Walk over space more resilient implementation.
@@ -401,46 +498,67 @@ namespace ZobristCSharp
             while ((p < fen.Length) && (fen[p] == ' ' || fen[p] == '-')) p++;
 
             // Hash the en-passant, but verify it using board and player_to_move.
-            // This looks Wwrong
+            // Only the player_to_move en-passant is stored
+            // Howevershould ther be 0 - n en-passant(s) possible, so should loop
+            // but have never seen FEN with multi en-passants.
 
             ///////////////////////////////////////////////////////////////////
             /// En-passant                                                  ///
             ///////////////////////////////////////////////////////////////////          
-            if ((p + 1 < fen.Length) && 
-               RANK.Contains(fen[p]) &&
-               FILE.Contains(fen[p+1]))
+            if (p + 1 < fen.Length && 
+              (RANK.Contains(fen[p]) &&
+               FILE.Contains(fen[p+1]))) //TODO: Use FILE value, even as a extre check.
             {
                 f = ((char)fen[p] - 'a');
  
-                if (toMove == "b")
+                if (report.turn == "b")
                 {
-                    if ((f > 0 && board[f - 1, 3] == 'p') ||
-                        (f < 7 && board[f + 1, 3] == 'p'))
+                    // TODO: This looks Wrong
+                    if ((f > 0 && report.board[f - 1, 3] == 'p') ||
+                        (f < 7 && report.board[f + 1, 3] == 'p'))
+                    {
+                        key ^= Random64[RANDOM_EN_PASSANT + f];
+                    } 
+                    else if(strict)
+                    {
+                        report.err++;
+                        report.errorsText.Add("En-passant for black possible invalid.");
+                    }
+                }
+                else if (report.turn == "w")
+                {
+                    // TODO: This looks Wrong
+                    if ((f > 0 && report.board[f - 1, 4] == 'P') ||
+                        (f < 7 && report.board[f + 1, 4] == 'P'))
                     {
                         key ^= Random64[RANDOM_EN_PASSANT + f];
                     }
-                }
-                else if (toMove == "w")
-                {
-                    if ((f > 0 && board[f - 1, 4] == 'P') ||
-                        (f < 7 && board[f + 1, 4] == 'P'))
+                    else if (strict)
                     {
-                        key ^= Random64[RANDOM_EN_PASSANT + f];
+                        report.err++;
+                        report.errorsText.Add("En-passant for white possible invalid.");
                     }
                 }
                 p+=2;
+            } 
+            else if(strict)
+            {
+                // RANK or FILE MISSING. If we have RANK we must have FILE.
+                // But I don't use FILE. TODO. This needs checking, as should use FILE
             }
 
             // If white is to move then "toMove" is the sole in RandomTurn.
             // Black is zero, so RandomTurn is not used.
 
-            if (toMove != "" && toMove == "w")
+            if (report.turn != "" && report.turn == "w")
             {
                 key ^= Random64[RANDOM_TURN];
             }
 
             // Walk over space more resilient implementation.
             while ((p < fen.Length) && (fen[p] == ' ' || fen[p] == '-')) p++;
+
+            // OPTIONAL VALUES
 
             ///////////////////////////////////////////////////////////////////
             /// Fifty draw rule                                             ///
@@ -450,7 +568,7 @@ namespace ZobristCSharp
                 // The number of moves since a capture or pawn move,
                 // used to handle the fifty move draw rule.
                 // Not used yet.
-                int fiftyDrawRule = System.Convert.ToInt16(fen[p].ToString());
+                report.fiftyDrawRule = System.Convert.ToInt16(fen[p].ToString());
                 p++;
             }
 
@@ -463,34 +581,11 @@ namespace ZobristCSharp
             if (p < fen.Length && NUMBERS.Contains(fen[p]))
             {
                 // Not used yet.
-                int moves = System.Convert.ToInt16(fen[p].ToString());
+                report.moves = System.Convert.ToInt16(fen[p].ToString());
             }
 
-            return key;
-        }
-
-        public static void DisplayBoard(char[,] board, 
-            int file_show, 
-            int rank_show, 
-            bool humanReadable = false)
-        {
-            for (int f = 0; f <= 7; f++)
-            {
-                for (int r = 0; r <= 7; r++)
-                {
-                    // Normal user view is board[r, 7-f]
-
-                    if (file_show == f && rank_show == r)
-                    {
-                        System.Console.Write("<{0}>", (!humanReadable)?board[f, r]:board[r, 7 - f]);
-                    } else
-                    {
-                        System.Console.Write("[{0}]", (!humanReadable)?board[f, r]:board[r, 7 - f]);
-                    }
-                }
-                System.Console.Write("\n");
-            }
-            System.Console.Write("\n");
+            report.hash = key; 
+            return report;
         }
     }
 }

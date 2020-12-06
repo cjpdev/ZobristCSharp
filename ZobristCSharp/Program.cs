@@ -43,6 +43,9 @@ namespace ZobristCSharp
             hash = ZobristHash.GetHash(fen);
             System.Console.WriteLine("Test pass:{0}, hash={1}, FEN={2}\n\n", (hash == 0x0756b94461c50fb0), hash, fen);
 
+            ZobristHash.Report rep = ZobristHash.GetHashWithReport(fen);
+            System.Console.WriteLine(rep);
+
             // fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
             // System.UInt64 hash = ZobristHash.GetHash(fen);
             // Console.WriteLine("Hash=({0}), FEN({1})", hash, fen);
