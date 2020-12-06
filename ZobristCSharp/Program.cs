@@ -1,0 +1,63 @@
+﻿
+/*************************************************************************/
+/* Copyright (c) 2020 Chay Palton                                        */
+/*                                                                       */
+/* Permission is hereby granted, free of charge, to any person obtaining */
+/* a copy of this software and associated documentation files (the       */
+/* "Software"), to deal in the Software without restriction, including   */
+/* without limitation the rights to use, copy, modify, merge, publish,   */
+/* distribute, sublicense, and/or sell copies of the Software, and to    */
+/* permit persons to whom the Software is furnished to do so, subject to */
+/* the following conditions:                                             */
+/*                                                                       */
+/* The above copyright notice and this permission notice shall be        */
+/* included in all copies or substantial portions of the Software.       */
+/*                                                                       */
+/* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,       */
+/* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF    */
+/* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.*/
+/* IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY  */
+/* CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,  */
+/* TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE     */
+/* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
+/*************************************************************************/
+
+
+using System;
+
+namespace ZobristCSharp
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {   
+            Console.WriteLine("FEN to hash key\n\n");
+            string fen = "";
+
+            //en-passant test
+            fen = "rnbqkbnr/p1pppppp/8/8/PpP4P/8/1P1PPPP1/RNBQKBNR b KQkq c3 0 3";
+            System.UInt64 hash = ZobristHash.GetHash(fen);
+            System.Console.WriteLine("Test pass:{0}, hash={1}, FEN={2}\n\n", (hash == 0x3c8123ea7b067637),hash, fen);
+
+            fen = "rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 2";
+            hash = ZobristHash.GetHash(fen);
+            System.Console.WriteLine("Test pass:{0}, hash={1}, FEN={2}\n\n", (hash == 0x0756b94461c50fb0), hash, fen);
+
+            // fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+            // System.UInt64 hash = ZobristHash.GetHash(fen);
+            // Console.WriteLine("Hash=({0}), FEN({1})", hash, fen);
+
+            /*
+                fen = "rnbqkbnr/ppp2ppp/3p4/4p3/8/5NPP/PPPPPP2/RNBQKB1R";
+                hash = ZobristHash.GetHash(fen);
+                Console.WriteLine("Hash=({0}), FEN({1})", hash, fen);
+
+                fen = "rnbqkbnr/ppp2ppp/3p4/4p3/8/5NPP/PPPPPP2/RNBQKB1R w";
+                hash = ZobristHash.GetHash(fen);
+                Console.WriteLine("Hash=({0}), FEN({1})", hash, fen);
+            */
+
+            Console.WriteLine("\n\n");
+        }
+    }
+}

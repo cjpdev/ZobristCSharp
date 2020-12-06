@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30711.63
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZobristCSharp", "ZobristCSharp\ZobristCSharp.csproj", "{A65E3270-FCD5-4E4B-9806-C4C243141E4D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A65E3270-FCD5-4E4B-9806-C4C243141E4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A65E3270-FCD5-4E4B-9806-C4C243141E4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A65E3270-FCD5-4E4B-9806-C4C243141E4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A65E3270-FCD5-4E4B-9806-C4C243141E4D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D8618002-7BF9-48BF-A040-5B876D11200D}
+	EndGlobalSection
+EndGlobal
