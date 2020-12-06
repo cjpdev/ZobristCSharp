@@ -30,6 +30,19 @@ namespace ZobristCSharp
 {
    public static class ZobristHash
     {
+        /*
+         * The main purpose of Zobrist hash codes in chess programming is to get an 
+         * almost unique index number for any chess position, with a very important 
+         * requirement that two similar positions generate entirely different indices. 
+         * These index numbers are used for faster and more space efficient Hash tables
+         * for the opening books. 
+         */
+
+         /*
+          * Must use a unsiged 64 bit integer, to give best result (less collisions).
+          * 
+          */
+
         private static readonly System.UInt64[] Random64 = new System.UInt64[781] 
         {
             0x9D39247E33776D41, 0x2AF7398005AAA5C7, 0x44DB015024623547, 0x9C15F73E62A76AE2,
@@ -230,7 +243,7 @@ namespace ZobristCSharp
             0xF8D626AAAF278509
         };
 
-        /**
+        /** Wrong
         *   Concatenations subarrays
         *  
         *   Piece     offset: 000, length: 768
@@ -239,10 +252,25 @@ namespace ZobristCSharp
         *   Turn      offset: 780, length: 001
         */
 
+        /*  Definition see to be in wrong order, https://www.chessprogramming.org/Zobrist_Hashing
+         *  One number for each piece at each square
+         *  One number to indicate the side to move is black
+         *  Four numbers to indicate the castling rights, though usually 16 (2^4) are used for speed
+         *  Eight numbers to indicate the file of a valid En passant square, if any
+         * This leaves us with an array with 781 (12*64 + 1 + 4 + 8) random numbers.Since pawns don't happen on first and eighth rank, one might be fine with 12*64 though. There are even proposals and implementations to use overlapping keys from unaligned access up to an array of only 12 numbers for every piece and to rotate that number by square [13] [14] 
+        */
+
         private const int RANDOM_PIECE = 0;
-        private const int RANDOM_CASTLE = 768;
-        private const int RANDOM_EN_PASSANT = 772;
-        private const int RANDOM_TURN = 780;
+        private const int RANDOM_TURN = 768;
+        private const int RANDOM_CASTLE = 768 + 1;
+        private const int RANDOM_EN_PASSANT = 768 + 1 + 4;
+
+       // Books are not implemented in this order, above is correct., 
+       // private const int RANDOM_PIECE = 0;
+       // private const int RANDOM_CASTLE = 768;
+       // private const int RANDOM_EN_PASSANT = 772;
+       // private const int RANDOM_TURN = 780;
+   
 
         private const string PIECES = "pPnNbBrRqQkK";
         private const string FILE = "012345678";
