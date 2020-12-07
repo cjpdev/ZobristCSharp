@@ -243,7 +243,7 @@ namespace ZobristCSharp
             0xF8D626AAAF278509
         };
 
-        /** Wrong
+        /** 
         *   Concatenations subarrays
         *  
         *   Piece     offset: 000, length: 768
@@ -260,16 +260,18 @@ namespace ZobristCSharp
          * This leaves us with an array with 781 (12*64 + 1 + 4 + 8) random numbers.Since pawns don't happen on first and eighth rank, one might be fine with 12*64 though. There are even proposals and implementations to use overlapping keys from unaligned access up to an array of only 12 numbers for every piece and to rotate that number by square [13] [14] 
         */
 
-        private const int RANDOM_PIECE = 0;
-        private const int RANDOM_TURN = 768;
-        private const int RANDOM_CASTLE = 768 + 1;
-        private const int RANDOM_EN_PASSANT = 768 + 1 + 4;
+        /* Wrong
+        * private const int RANDOM_PIECE = 0;
+        * private const int RANDOM_TURN = 768;
+        * private const int RANDOM_CASTLE = 768 + 1;
+        * private const int RANDOM_EN_PASSANT = 768 + 1 + 4;
+        */
 
-       // Books are not implemented in this order, above is correct., 
-       // private const int RANDOM_PIECE = 0;
-       // private const int RANDOM_CASTLE = 768;
-       // private const int RANDOM_EN_PASSANT = 772;
-       // private const int RANDOM_TURN = 780;
+        // Books are not implemented in the above, this order is correct
+        private const int RANDOM_PIECE = 0;
+        private const int RANDOM_CASTLE = 768;
+        private const int RANDOM_EN_PASSANT = 772;
+        private const int RANDOM_TURN = 780;
    
 
         private const string PIECES = "pPnNbBrRqQkK";
