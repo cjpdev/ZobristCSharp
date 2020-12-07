@@ -48,6 +48,7 @@ namespace ZobristCSharp
             hash = ZobristHash.GetHash(fen);
             System.Console.WriteLine("Test opening position pass:{0}, hash=0x{1}, FEN={2}\n\n", (hash == key), hash.ToString("X"), fen);
 
+            // Report 
             ZobristHash.Report rep = ZobristHash.GetHashWithReport(fen);
             System.Console.WriteLine(rep);
 
@@ -59,6 +60,9 @@ namespace ZobristCSharp
             fen = "rnbqkbnr/ppp2ppp/3p4/4p3/8/5NPP/PPPPPP2/RNBQKB1R";
             hash = ZobristHash.GetHash(fen);
             Console.WriteLine("Hash=({0}), FEN({1})", hash, fen);
+            // Report 
+            rep = ZobristHash.GetHashWithReport(fen);
+            System.Console.WriteLine(rep);s
 
             fen = "rnbqkbnr/ppp2ppp/3p4/4p3/8/5NPP/PPPPPP2/RNBQKB1R w";
             hash = ZobristHash.GetHash(fen);
