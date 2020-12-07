@@ -252,12 +252,16 @@ namespace ZobristCSharp
         *   Turn      offset: 780, length: 001
         */
 
-        /*  Definition see to be in wrong order, https://www.chessprogramming.org/Zobrist_Hashing
-         *  One number for each piece at each square
-         *  One number to indicate the side to move is black
-         *  Four numbers to indicate the castling rights, though usually 16 (2^4) are used for speed
-         *  Eight numbers to indicate the file of a valid En passant square, if any
-         * This leaves us with an array with 781 (12*64 + 1 + 4 + 8) random numbers.Since pawns don't happen on first and eighth rank, one might be fine with 12*64 though. There are even proposals and implementations to use overlapping keys from unaligned access up to an array of only 12 numbers for every piece and to rotate that number by square [13] [14] 
+        /*  https://www.chessprogramming.org/Zobrist_Hashing
+         *  This definition seems to be in wrong order. 
+         *      One number for each piece at each square
+         *      One number to indicate the side to move is black
+         *      Four numbers to indicate the castling rights, though usually 16 (2^4) are used for speed
+         *      Eight numbers to indicate the file of a valid En passant square, if any
+         *          This leaves us with an array with 781 (12*64 + 1 + 4 + 8) random numbers.
+         *          Since pawns don't happen on first and eighth rank, one might be fine with 12*64 though. 
+         *          There are even proposals and implementations to use overlapping keys from unaligned access
+         *          up to an array of only 12 numbers for every piece and to rotate that number by square [13] [14] 
         */
 
         /* Wrong
@@ -267,36 +271,22 @@ namespace ZobristCSharp
         * private const int RANDOM_EN_PASSANT = 768 + 1 + 4;
         */
 
-        // Books are not implemented in the above, this order is correct
+        // Books are not implemented the definition above describes
+        // This order seems to correct from testing a number of different books
         private const int RANDOM_PIECE = 0;
         private const int RANDOM_CASTLE = 768;
         private const int RANDOM_EN_PASSANT = 772;
         private const int RANDOM_TURN = 780;
    
-
+        /// <summary>
+        /// Useful constants.
+        /// </summary>
         private const string PIECES = "pPnNbBrRqQkK";
-        private const string FILE = "012345678";
+        private const string FILE = "12345678";
         private const string RANK = "abcdefgh";
         private const string CASTLING = "KQkq";
         private const string NUMBERS = FILE;
         private const int MIN_FEN_BOARD_DATA = 26;
-
-        /**
-        *   Encoding.
-        * 
-        *   black pawn    0
-        *   white pawn    1
-        *   black knight  2
-        *   white knight  3
-        *   black bishop  4
-        *   white bishop  5
-        *   black rook    6
-        *   white rook    7
-        *   black queen   8
-        *   white queen   9
-        *   black king   10
-        *   white king   11
-        */
 
 
         // Get more detail information about the Hashing.
@@ -306,15 +296,17 @@ namespace ZobristCSharp
             public int fiftyDrawRule = 0;
             public int moves = 0;
             public char[,] board = null;
-            public List<string> errorsText = new List<string>();
-            public int err = 0;
+            public List<string> infoText = new List<string>();
+            public int errors = 0;
+            public int warnings = 0;
             public string turn = ""; 
 
-            public Report()
-            {
+            public Report() {}
 
-            }
-
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <returns></returns>
             public override string ToString()
             {
                 return BoardAsText(-1, -1, true);
@@ -324,7 +316,7 @@ namespace ZobristCSharp
             /// Display the information generated when converting
             /// the FEN to a Hash. Inlucding the board loayout.
             /// 
-            /// If error(s) are reported then check the errorsText List,
+            /// If error(s) or warning(s) are reported then check the infoText List,
             /// as the board may not be valid.
             /// 
             /// fileShow and rankShow can be used to highlight a square on the board.
@@ -340,33 +332,39 @@ namespace ZobristCSharp
                 int rankShow,
                 bool humanReadable = false)
             {
-                string textboard = "";
-                textboard += "turn = " + turn + " | ";
+                string textboard = "\n";
+                if (turn != "")
+                    textboard += "\tturn = " + turn + " | ";
+                else textboard += "\t";
+
                 textboard += "fiftyDrawRule = " + fiftyDrawRule + " | ";
                 textboard += "moves = " + moves + "\n";
 
-                for (int f = 0; f <= 7; f++)
+                for (int file = 0; file <= 7; file++)
                 {
                     textboard += "\t";
 
-                    for (int r = 0; r <= 7; r++)
+                    for (int rank = 0; rank <= 7; rank++)
                     {
                         // Normal user view is board[r, 7-f]
 
-                        if (fileShow == f && rankShow == r)
+                        if (fileShow == file && rankShow == rank)
                         {
-                            textboard += "[" + ((!humanReadable) ? board[f, r] : board[r, 7 - f]) + ">";
+                            textboard += "[" + ((!humanReadable) ? board[file, rank] : board[rank, 7 - file]) + ">";
                         }
                         else
                         {
-                            textboard += "[" + ((!humanReadable) ? board[f, r] : board[r, 7 - f]) + "]";
+                            textboard += "[" + ((!humanReadable) ? board[file, rank] : board[rank, 7 - file]) + "]";
                         }
                     }
                     textboard += "\n";
                 }
 
-                if (errorsText.Count > 0 || err != 0)
-                    textboard += "\t*** Board has error(s) ****\n";
+                if (infoText.Count > 0)
+                {
+                    textboard += "\t*** Board has error(s) :" + errors.ToString() + ", and ";
+                    textboard += "warning(s) :" + errors.ToString() + " ***\n";
+                }
 
                 return textboard;
             }
@@ -393,13 +391,14 @@ namespace ZobristCSharp
             report.board = new char[8, 8];
             char c;
 
-            int p = 0, r = 7, f = 0, i, kindOfPpiece;
+            int piece = 0, rank = 7, file = 0, kindOfPpiece;
             
             System.UInt64 key = 0;
 
             fen = fen.Normalize();
             // FEN order  [board]' '[players turn|none]' '[castling|-]' '[en-passant|-]' '[ply|0-8]' '[move|0]
 
+            // TODO:
             // This looks like it could be wrong, as the boards rank and file 
             // seem to be rotate 90 when displayed.
             // Once Hash is working try Hash with board with the other settup
@@ -410,9 +409,9 @@ namespace ZobristCSharp
             ///////////////////////////////////////////////////////////////////
             /// Get Board layout                                            ///
             ///////////////////////////////////////////////////////////////////
-            while ((p < fen.Length) && fen[p] !=' ')
+            while ((piece < fen.Length) && fen[piece] !=' ')
             {
-                c = fen[p];
+                c = fen[piece];
 
                 if (c == 'K' || c == 'k')
                 {
@@ -421,40 +420,40 @@ namespace ZobristCSharp
 
                 if (c == '/')
                 {
-                    r--;
-                    f = 0;
+                    rank--;
+                    file = 0;
                 }
                 else if (('1' <= c) && ('8' >= c))
                 {
-                    for (i = 0; i <= c - '1'; i++)
+                    for (int i = 0; i <= c - '1'; i++)
                     {
-                        report.board[f++, r] = '-';
+                        report.board[file++, rank] = '-';
                     }
                 }
                 else
                 {
-                    report.board[f++, r] = c;
+                    report.board[file++, rank] = c;
                 }
-                p++;
+                piece++;
             }
 
-            if(p < MIN_FEN_BOARD_DATA || hasKings < 2)
+            if(piece < MIN_FEN_BOARD_DATA || hasKings < 2)
             {
-                report.err = 1;
-                if (p < MIN_FEN_BOARD_DATA)
-                    report.errorsText.Add("Less than minimum " + MIN_FEN_BOARD_DATA + "character in the FEN board layout data.");
+                report.errors++;
+                if (piece < MIN_FEN_BOARD_DATA)
+                    report.infoText.Add("Error::Less than minimum " + MIN_FEN_BOARD_DATA + "character in the FEN board layout data.");
                 if (hasKings < 2)
-                    report.errorsText.Add("Missing king(s)");
+                    report.infoText.Add("Error::Missing king(s)");
                 return report;
             }
 
             // Hash pieces based on board locations
 
-            for (f = 0; f <= 7; f++)
+            for (file = 0; file <= 7; file++)
             {
-                for (r = 0; r <= 7; r++)
+                for (rank = 0; rank <= 7; rank++)
                 {
-                    c = report.board[f, r];
+                    c = report.board[file, rank];
 
                     if (c != '-')
                     {
@@ -465,35 +464,35 @@ namespace ZobristCSharp
                         // in RANDOM_PIECE corresponding to a piece is computed as follows.
                         // offset_piece = 64 * kind of piece + 8 * row + file;
 
-                        key ^= Random64[RANDOM_PIECE + 64 * kindOfPpiece + 8 * r + f];
+                        key ^= Random64[RANDOM_PIECE + 64 * kindOfPpiece + 8 * rank + file];
                     }
                 }
             }
 
             // Walk over space more resilient implementation.
-            while ((p < fen.Length) && fen[p] == ' ') p++;
+            while ((piece < fen.Length) && fen[piece] == ' ') piece++;
 
             ///////////////////////////////////////////////////////////////////
             /// Find which players turn it is. This get hashed at the end.  ///
             ///////////////////////////////////////////////////////////////////
-            if ((p < fen.Length) && (fen[p] == 'w' || fen[p] == 'b'))
+            if ((piece < fen.Length) && (fen[piece] == 'w' || fen[piece] == 'b'))
             {
-                report.turn = fen[p].ToString();
-                p += 1;
+                report.turn = fen[piece].ToString();
+                piece += 1;
             } 
             else if(strict)
             {
-                report.err++;
-                report.errorsText.Add("Missing turn data..");
+                report.warnings++;
+                report.infoText.Add("Warning::Missing turn information.");
             }
 
             // Walk over space more resilient implementation.
-            while (p < fen.Length && fen[p] == ' ')  p++;
+            while (piece < fen.Length && fen[piece] == ' ')  piece++;
 
             ///////////////////////////////////////////////////////////////////
             /// Get castling.                                               ///
             ///////////////////////////////////////////////////////////////////
-            while ((p < fen.Length) && fen[p] != '-' && CASTLING.Contains(fen[p]))
+            while ((piece < fen.Length) && fen[piece] != '-' && CASTLING.Contains(fen[piece]))
             {
                 /**
                 *   castle
@@ -503,7 +502,7 @@ namespace ZobristCSharp
                 *   black can castle short     2
                 *   black can castle long      3
                 */
-                c = fen[p++];
+                c = fen[piece++];
 
                 switch (c)
                 {
@@ -525,29 +524,41 @@ namespace ZobristCSharp
             }
 
             // Walk over space more resilient implementation.
-            while ((p < fen.Length) && (fen[p] == ' ' || fen[p] == '-')) p++;
+            while ((piece < fen.Length) && (fen[piece] == ' ' || fen[piece] == '-')) piece++;
 
-            // Hash the en-passant, but verify it using board and player_to_move.
-            // Only the player_to_move en-passant is stored
-            // Howevershould ther be 0 - n en-passant(s) possible, so should loop
-            // but have never seen FEN with multi en-passants.
+            // Hash the en-passant. Only the player_to_move en-passant is stored.
 
             ///////////////////////////////////////////////////////////////////
-            /// En-passant                                                  ///
-            ///////////////////////////////////////////////////////////////////          
-            if (p + 1 < fen.Length && 
-              (RANK.Contains(fen[p]) &&
-               FILE.Contains(fen[p+1]))) //TODO: Use FILE value, even as a extre check.
+            /// En-passant : Always problematic in chess programs           ///
+            ///////////////////////////////////////////////////////////////////     
+
+            // FILE is not need, as only the RANK is useful. Could use FILE to validate the FEN
+            // But FILE can be optional, as only RANK is use.
+            // if ((piece + 1 < fen.Length) && (RANK.Contains(fen[piece]) && FILE.Contains(fen[piece+1])))
+            if ((piece < fen.Length) && RANK.Contains(fen[piece]))
             {
-                f = ((char)fen[p] - 'a');
- 
+                file = ((char)fen[piece] - 'a');
+                key ^= Random64[RANDOM_EN_PASSANT + file];
+
+                // verify it using board and player_to_move, of the en-passant.
+                // Do I even need to check positions, as we should 
+                // just trust the FEN. This class will be use with
+                // my chess engine. Which will verified each
+                // AI(Computer) move and each Human move.
+                // Thus the en-passant will be valid within the context of my 
+                // implemenation of the engine handling the en-passant.
+
+                // This is only useful if I let other people use this code.
+
+                // Removed and just doing key ^= Random64[RANDOM_EN_PASSANT + f];
+                /*
                 if (report.turn == "b")
                 {
                     // TODO: This looks Wrong
-                    if ((f > 0 && report.board[f - 1, 3] == 'p') ||
-                        (f < 7 && report.board[f + 1, 3] == 'p'))
+                    if ((file > 0 && report.board[file - 1, 3] == 'p') ||
+                        (file < 7 && report.board[file + 1, 3] == 'p'))
                     {
-                        key ^= Random64[RANDOM_EN_PASSANT + f];
+                        key ^= Random64[RANDOM_EN_PASSANT + file];
                     } 
                     else if(strict)
                     {
@@ -558,10 +569,10 @@ namespace ZobristCSharp
                 else if (report.turn == "w")
                 {
                     // TODO: This looks Wrong
-                    if ((f > 0 && report.board[f - 1, 4] == 'P') ||
-                        (f < 7 && report.board[f + 1, 4] == 'P'))
+                    if ((file > 0 && report.board[file - 1, 4] == 'P') ||
+                        (file < 7 && report.board[file + 1, 4] == 'P'))
                     {
-                        key ^= Random64[RANDOM_EN_PASSANT + f];
+                        key ^= Random64[RANDOM_EN_PASSANT + file];
                     }
                     else if (strict)
                     {
@@ -569,12 +580,20 @@ namespace ZobristCSharp
                         report.errorsText.Add("En-passant for white possible invalid.");
                     }
                 }
-                p+=2;
+                */
+                // Form my understanding FILE can be optional, as only RANK is use.
+                // So this should cover both cases.
+                if ((piece + 1 < fen.Length) && FILE.Contains(fen[piece + 1]))
+                {
+                    piece++;
+                }
+
+                piece ++;
             } 
             else if(strict)
             {
-                // RANK or FILE MISSING. If we have RANK we must have FILE.
-                // But I don't use FILE. TODO. This needs checking, as should use FILE
+                // RANK without FILE MISSING is a possible error.
+                // No FILE can be optional , as only RANK is use.
             }
 
             // If white is to move then "toMove" is the sole in RandomTurn.
@@ -586,32 +605,32 @@ namespace ZobristCSharp
             }
 
             // Walk over space more resilient implementation.
-            while ((p < fen.Length) && (fen[p] == ' ' || fen[p] == '-')) p++;
+            while ((piece < fen.Length) && (fen[piece] == ' ' || fen[piece] == '-')) piece++;
 
             // OPTIONAL VALUES
 
             ///////////////////////////////////////////////////////////////////
             /// Fifty draw rule                                             ///
             ///////////////////////////////////////////////////////////////////
-            if (p < fen.Length && NUMBERS.Contains(fen[p]))
+            if (piece < fen.Length && NUMBERS.Contains(fen[piece]))
             {
                 // The number of moves since a capture or pawn move,
                 // used to handle the fifty move draw rule.
                 // Not used yet.
-                report.fiftyDrawRule = System.Convert.ToInt16(fen[p].ToString());
-                p++;
+                report.fiftyDrawRule = System.Convert.ToInt16(fen[piece].ToString());
+                piece++;
             }
 
             // Walk over space more resilient implementation.
-            while ((p < fen.Length) && (fen[p] == ' ' || fen[p] == '-')) p++;
+            while ((piece < fen.Length) && (fen[piece] == ' ' || fen[piece] == '-')) piece++;
 
             ///////////////////////////////////////////////////////////////////
             /// Move                                                        ///
             ///////////////////////////////////////////////////////////////////
-            if (p < fen.Length && NUMBERS.Contains(fen[p]))
+            if (piece < fen.Length && NUMBERS.Contains(fen[piece]))
             {
                 // Not used yet.
-                report.moves = System.Convert.ToInt16(fen[p].ToString());
+                report.moves = System.Convert.ToInt16(fen[piece].ToString());
             }
 
             report.hash = key; 

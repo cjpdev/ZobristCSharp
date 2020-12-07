@@ -36,9 +36,9 @@ namespace ZobristCSharp
             System.UInt64 key = 0;
 
             //en-passant test
-            fen = "rnbqkbnr/p1pppppp/8/8/PpP4P/8/1P1PPPP1/RNBQKBNR b KQkq 0 0";
+            fen = "rnbqkbnr/p1pppppp/8/8/PpP4P/8/1P1PPPP1/RNBQKBNR b KQkq c3 0 3";
+            key = 0x3c8123ea7b067637;
             System.UInt64 hash = ZobristHash.GetHash(fen);
-            key = hash;
             System.Console.WriteLine("Test pass:{0}, hash=0x{1}, FEN={2}\n\n", (hash == key), hash.ToString("X"), fen);
 
 
@@ -47,27 +47,28 @@ namespace ZobristCSharp
             key = 0x463b96181691fc9c;
             hash = ZobristHash.GetHash(fen);
             System.Console.WriteLine("Test opening position pass:{0}, hash=0x{1}, FEN={2}\n\n", (hash == key), hash.ToString("X"), fen);
-
-            // Report 
-            ZobristHash.Report rep = ZobristHash.GetHashWithReport(fen);
-            System.Console.WriteLine(rep);
-
+            
+            // Does some extra , rubish FENs
             fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
             hash = ZobristHash.GetHash(fen);
             Console.WriteLine("Hash=({0}), FEN({1})", hash, fen);
 
-            
             fen = "rnbqkbnr/ppp2ppp/3p4/4p3/8/5NPP/PPPPPP2/RNBQKB1R";
             hash = ZobristHash.GetHash(fen);
             Console.WriteLine("Hash=({0}), FEN({1})", hash, fen);
-            // Report 
-            rep = ZobristHash.GetHashWithReport(fen);
+
+
+            // Report en-passant test
+            fen = "rnbqkbnr/p1pppppp/8/8/PpP4P/8/1P1PPPP1/RNBQKBNR b KQkq c3 0 3";
+            ZobristHash.Report rep = ZobristHash.GetHashWithReport(fen);
+            Console.WriteLine("Hash=({0}), FEN({1})", rep.hash, fen);
             System.Console.WriteLine(rep);
 
-            fen = "rnbqkbnr/ppp2ppp/3p4/4p3/8/5NPP/PPPPPP2/RNBQKB1R w";
-            hash = ZobristHash.GetHash(fen);
-            Console.WriteLine("Hash=({0}), FEN({1})", hash, fen);
-       
+            fen = "rnbqkbnr/ppp2ppp/3p4/4p3/8/5NPP/PPPPPP2/RNBQKB1R";
+            rep = ZobristHash.GetHashWithReport(fen);
+            Console.WriteLine("Hash=({0}), FEN({1})", rep.hash, fen);
+            System.Console.WriteLine(rep);
+
 
             Console.WriteLine("\n\n");
         }
