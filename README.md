@@ -9,3 +9,6 @@ to FEN, and than look it up to see if there are any known moves for the board la
 
 This is a more robust implementation, as we don't want to generate rubish keys.
 Also I want error reporting to show problem in the FEN.
+
+Software to be used with my chess game (Computer player lookup). 
+This is part of a pair of implementations the other being my ZobristCSharp Hash, https://github.com/cjpdev/PolyglotCSharp
