@@ -62,7 +62,7 @@ namespace ZobristCSharp
             Console.WriteLine("Hash=({0}), FEN({1})", hash, fen);
             // Report 
             rep = ZobristHash.GetHashWithReport(fen);
-            System.Console.WriteLine(rep);s
+            System.Console.WriteLine(rep);
 
             fen = "rnbqkbnr/ppp2ppp/3p4/4p3/8/5NPP/PPPPPP2/RNBQKB1R w";
             hash = ZobristHash.GetHash(fen);
