@@ -304,7 +304,7 @@ namespace ZobristCSharp
 
         private const int PIECE  = 0;
         private const int COLOR  = 1;
-        private const int VALUE  = 1;
+        private const int VALUE  = 2;
 
         /// <summary>
         /// Map for FEN to Board to HASH pice value.
@@ -415,9 +415,9 @@ namespace ZobristCSharp
         // Update to more robust implementation.
         public static System.UInt64 GetHash(string fen)
         {
-            Result report = GetHashExtend(fen);
-            System.UInt64 hash = report.hash;
-            report = null; // Garbage collect ready.
+            Result result = GetHashExtend(fen);
+            System.UInt64 hash = result.hash;
+            result = null; // Garbage collect ready.
             return hash;
         }
 

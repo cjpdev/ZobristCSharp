@@ -54,11 +54,19 @@ namespace ZobristCSharp
             Console.WriteLine("FEN to hash key\n\n");
             string fen = "";
             System.UInt64 key = 0;
+            System.UInt64 hash = 0;
+
+            // Get next move from current board loyout, which in this case is      
+            // the first open move. So should be in every openng book.
+             fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+            key = 5060803636482931868;
+            hash = ZobristHash.GetHash(fen);
+            System.Console.WriteLine("Test pass:{0}, hash=0x{1}, FEN={2}\n\n", (hash == key), hash.ToString("X"), fen);
 
             //en-passant test
             fen = "rnbqkbnr/p1pppppp/8/8/PpP4P/8/1P1PPPP1/RNBQKBNR b KQkq c3 0 3";
             key = 0x3c8123ea7b067637;
-            System.UInt64 hash = ZobristHash.GetHash(fen);
+            hash = ZobristHash.GetHash(fen);
             System.Console.WriteLine("Test pass:{0}, hash=0x{1}, FEN={2}\n\n", (hash == key), hash.ToString("X"), fen);
 
             // Open start position..
