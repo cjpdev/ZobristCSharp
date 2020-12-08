@@ -22,7 +22,6 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
 
-
 using System;
 
 namespace ZobristCSharp
@@ -31,13 +30,13 @@ namespace ZobristCSharp
     {
         static void Main(string[] args)
         {
-
             Console.WriteLine("Chay's chess.\n");
 
             string fen1 = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
             System.UInt64 knownHash = 5060803636482931868;
             System.UInt64 hash1 = ZobristHash.GetHash(fen1);
-            ZobristHash.Result rep1 = ZobristHash.GetHashWithReport(fen1);
+            ZobristHash.Result rep1 = ZobristHash.GetHashResult(fen1);
 
             string strboard = "";
             string refBoard = "3124521300000000666666666666666666666666666666660000000031245213";
@@ -52,46 +51,43 @@ namespace ZobristCSharp
                 System.Console.WriteLine("Test Passed\n");
             }
  
-            
             Console.WriteLine("FEN to hash key\n\n");
-                string fen = "";
-                System.UInt64 key = 0;
+            string fen = "";
+            System.UInt64 key = 0;
 
-                //en-passant test
-                fen = "rnbqkbnr/p1pppppp/8/8/PpP4P/8/1P1PPPP1/RNBQKBNR b KQkq c3 0 3";
-                key = 0x3c8123ea7b067637;
-                System.UInt64 hash = ZobristHash.GetHash(fen);
-                System.Console.WriteLine("Test pass:{0}, hash=0x{1}, FEN={2}\n\n", (hash == key), hash.ToString("X"), fen);
+            //en-passant test
+            fen = "rnbqkbnr/p1pppppp/8/8/PpP4P/8/1P1PPPP1/RNBQKBNR b KQkq c3 0 3";
+            key = 0x3c8123ea7b067637;
+            System.UInt64 hash = ZobristHash.GetHash(fen);
+            System.Console.WriteLine("Test pass:{0}, hash=0x{1}, FEN={2}\n\n", (hash == key), hash.ToString("X"), fen);
 
-                // Open start position..
-                fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-                key = 0x463b96181691fc9c;
-                hash = ZobristHash.GetHash(fen);
-                System.Console.WriteLine("Test opening position pass:{0}, hash=0x{1}, FEN={2}\n\n", (hash == key), hash.ToString("X"), fen);
+            // Open start position..
+            fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+            key = 0x463b96181691fc9c;
+            hash = ZobristHash.GetHash(fen);
+            System.Console.WriteLine("Test opening position pass:{0}, hash=0x{1}, FEN={2}\n\n", (hash == key), hash.ToString("X"), fen);
             
-                // Does some extra , rubish FENs
-                fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-                hash = ZobristHash.GetHash(fen);
-                Console.WriteLine("Hash=({0}), FEN({1})", hash, fen);
+            // Does some extra , rubish FENs
+            fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+            hash = ZobristHash.GetHash(fen);
+            Console.WriteLine("Hash=({0}), FEN({1})", hash, fen);
 
-                fen = "rnbqkbnr/ppp2ppp/3p4/4p3/8/5NPP/PPPPPP2/RNBQKB1R";
-                hash = ZobristHash.GetHash(fen);
-                Console.WriteLine("Hash=({0}), FEN({1})", hash, fen);
+            fen = "rnbqkbnr/ppp2ppp/3p4/4p3/8/5NPP/PPPPPP2/RNBQKB1R";
+            hash = ZobristHash.GetHash(fen);
+            Console.WriteLine("Hash=({0}), FEN({1})", hash, fen);
 
+            // Report en-passant test
+            fen = "rnbqkbnr/p1pppppp/8/8/PpP4P/8/1P1PPPP1/RNBQKBNR b KQkq c3 0 3";
+            ZobristHash.Result rep = ZobristHash.GetHashResult(fen);
+            Console.WriteLine("Hash=({0}), FEN({1})", rep.hash, fen);
+            System.Console.WriteLine(rep);
 
-                // Report en-passant test
-                fen = "rnbqkbnr/p1pppppp/8/8/PpP4P/8/1P1PPPP1/RNBQKBNR b KQkq c3 0 3";
-                ZobristHash.Result rep = ZobristHash.GetHashWithReport(fen);
-                Console.WriteLine("Hash=({0}), FEN({1})", rep.hash, fen);
-                System.Console.WriteLine(rep);
+            fen = "rnbqkbnr/ppp2ppp/3p4/4p3/8/5NPP/PPPPPP2/RNBQKB1R";
+            rep = ZobristHash.GetHashResult(fen);
+            Console.WriteLine("Hash=({0}), FEN({1})", rep.hash, fen);
+            System.Console.WriteLine(rep);
 
-                fen = "rnbqkbnr/ppp2ppp/3p4/4p3/8/5NPP/PPPPPP2/RNBQKB1R";
-                rep = ZobristHash.GetHashWithReport(fen);
-                Console.WriteLine("Hash=({0}), FEN({1})", rep.hash, fen);
-                System.Console.WriteLine(rep);
-           
-
-            Console.WriteLine("\n\n");
+            Console.WriteLine("\n");
         }
     }
 }
