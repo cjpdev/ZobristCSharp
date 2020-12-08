@@ -24,7 +24,7 @@
 
 using System;
 
-namespace ZobristCSharp
+namespace Chess.utils
 {
     class Program
     {
