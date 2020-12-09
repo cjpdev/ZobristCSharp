@@ -26,7 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Chess.utils
+namespace Chess.Utils
 {
     public static class ZobristHash
     {

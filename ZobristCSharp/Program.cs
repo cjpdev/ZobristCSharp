@@ -24,7 +24,7 @@
 
 using System;
 
-namespace Chess.utils
+namespace Chess.Utils
 {
     class Program
     {
