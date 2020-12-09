@@ -32,7 +32,7 @@ namespace Chess.utils
         {
             Console.WriteLine("Chay's chess.\n");
 
-            string fen1 = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+            string fen1 = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq r1 0 1";
 
             System.UInt64 knownHash = 5060803636482931868;
             System.UInt64 hash1 = ZobristHash.GetHash(fen1);

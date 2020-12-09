@@ -1,4 +1,4 @@
-﻿
+
 /*************************************************************************/
 /* Copyright (c) 2020 Chay Palton                                        */
 /*                                                                       */
@@ -28,7 +28,7 @@ using System.Text;
 
 namespace Chess.utils
 {
-    public static class ZobristHash
+   public static class ZobristHash
     {
         /*
          * The main purpose of Zobrist hash codes in chess programming is to get an 
@@ -38,12 +38,12 @@ namespace Chess.utils
          * for the opening books. 
          */
 
-        /*
-         * Must use a unsiged 64 bit integer, to give best result (less collisions).
-         * 
-         */
+         /*
+          * Must use a unsiged 64 bit integer, to give best result (less collisions).
+          * 
+          */
 
-        private static readonly System.UInt64[] Random64 = new System.UInt64[781]
+        private static readonly System.UInt64[] Random64 = new System.UInt64[781] 
         {
             0x9D39247E33776D41, 0x2AF7398005AAA5C7, 0x44DB015024623547, 0x9C15F73E62A76AE2,
             0x75834465489C0C89, 0x3290AC3A203001BF, 0x0FBBAD1F61042279, 0xE83A908FF2FB60CA,
@@ -277,34 +277,34 @@ namespace Chess.utils
         private const int RANDOM_CASTLE = 768;
         private const int RANDOM_EN_PASSANT = 772;
         private const int RANDOM_TURN = 780;
-
+   
         /// <summary>
         /// Useful constants.
         /// </summary>
-
-        private const string FEN = "pPnNbBrRqQkK012345678/";
-        private const string FILE = "12345678";
-        private const string RANK = "abcdefgh";
+        
+        private const string FEN      = "pPnNbBrRqQkK012345678/";
+        private const string FILE     = "12345678";
+        private const string RANK     = "abcdefgh";
         private const string CASTLING = "KQkq";
 
-        private const string NUMBERS = FILE;
+        private const string NUMBERS  = FILE;
 
         private const int MIN_FEN_BOARD_DATA = 8 * 2;
 
-        private const int PAWN = 0;
+        private const int PAWN   = 0;
         private const int KNIGHT = 1;
         private const int BISHOP = 2;
-        private const int ROOK = 3;
-        private const int QUEEN = 4;
-        private const int KING = 5;
-        private const int EMPTY = 6;
+        private const int ROOK   = 3;
+        private const int QUEEN  = 4;
+        private const int KING   = 5;
+        private const int EMPTY  = 6;
 
-        private const int LIGHT = 0;
-        private const int DARK = 1;
+        private const int LIGHT  = 0;
+        private const int DARK   = 1;
 
-        private const int PIECE = 0;
-        private const int COLOR = 1;
-        private const int VALUE = 2;
+        private const int PIECE  = 0;
+        private const int COLOR  = 1;
+        private const int VALUE  = 2;
 
         /// <summary>
         /// Map for FEN to Board to HASH pice value.
@@ -331,9 +331,9 @@ namespace Chess.utils
             public int[] color = new int[64];
             public List<string> errors = new List<string>();
             public List<string> warnings = new List<string>();
-            public string turn = "";
+            public string turn = ""; 
 
-            public Result() { }
+            public Result() {}
 
             /// <summary>
             /// 
@@ -387,11 +387,11 @@ namespace Chess.utils
                         case BISHOP: piece = "b"; break;
                     }
 
-                    piece = (color[idx] == LIGHT) ? piece.ToUpper() : piece;
+                    piece = (color[idx] == LIGHT) ? piece.ToUpper():piece;
 
                     if (!(Position(rankShow, fileShow) == idx))
                     {
-                        textboard += "[" + piece + "]";
+                        textboard += "[" +  piece + "]";
                     }
                     else
                     {
@@ -438,7 +438,7 @@ namespace Chess.utils
             // FEN order  [board]' '[players turn|none]' '[castling|-]' '[en-passant|-]' '[ply|0-8]' '[move|0]
 
             Result result = new Result();
-
+             
             System.UInt64 key = 0;
 
             int hasKings = 0;
@@ -453,7 +453,7 @@ namespace Chess.utils
 
             string c;
 
-            while ((idx < fen.Length) && fen[idx] != ' ' && FEN.Contains(fen.Substring(idx, 1)))
+            while ((idx < fen.Length) && fen[idx] !=' ' && FEN.Contains(fen.Substring(idx,1)))
             {
                 c = fen.Substring(idx, 1);
 
@@ -481,9 +481,9 @@ namespace Chess.utils
                     {
                         if (c == "K" || c == "k") { hasKings++; }
 
-                        result.board[Position(rank, file)] = map[c][PIECE];
-                        result.color[Position(rank, file)] = map[c][COLOR];
-                        key ^= Random64[RANDOM_PIECE + 64 * map[c][VALUE] + 8 * rank + file];
+                        result.board[ Position(rank, file) ] = map[ c ][ PIECE ];
+                        result.color[ Position(rank, file) ] = map[ c ][ COLOR ];
+                        key ^= Random64[ RANDOM_PIECE + 64 * map[c][VALUE] + 8 * rank + file ];
                     }
 
                     squareCount++;
@@ -510,19 +510,18 @@ namespace Chess.utils
             ///////////////////////////////////////////////////////////////////
             /// Find which players turn it is. This get hashed at the end.  ///
             ///////////////////////////////////////////////////////////////////
-
+            
             if ((idx < fen.Length) && (fen[idx] == 'w' || fen[idx] == 'b'))
             {
                 result.turn = fen[idx].ToString();
                 idx += 1;
-            }
-            else
-            {
+            } 
+            else { 
                 result.warnings.Add("Warning::Missing turn information.");
             }
 
             // Walk over space more resilient implementation.
-            while (idx < fen.Length && fen[idx] == ' ') idx++;
+            while (idx < fen.Length && fen[idx] == ' ')  idx++;
 
             ///////////////////////////////////////////////////////////////////
             /// Get castling.                                               ///
@@ -537,21 +536,21 @@ namespace Chess.utils
                 *   black can castle short     2
                 *   black can castle long      3
                 */
-                c = fen.Substring(idx++, 1);
+                c = fen.Substring(idx++,1);
 
                 switch (c)
                 {
-                    case "K": key ^= Random64[RANDOM_CASTLE + 0]; break;
-                    case "Q": key ^= Random64[RANDOM_CASTLE + 1]; break;
-                    case "k": key ^= Random64[RANDOM_CASTLE + 2]; break;
-                    case "q": key ^= Random64[RANDOM_CASTLE + 3]; break;
+                    case "K":key ^= Random64[RANDOM_CASTLE + 0];break;
+                    case "Q":key ^= Random64[RANDOM_CASTLE + 1];break;
+                    case "k":key ^= Random64[RANDOM_CASTLE + 2];break;
+                    case "q":key ^= Random64[RANDOM_CASTLE + 3];break;
                     default:
                         break;
                 }
             }
 
             // Walk over space more resilient implementation.
-            while ((idx < fen.Length) && (fen.Substring(idx, 1) == " " || fen.Substring(idx, 1) == "-")) idx++;
+            while ((idx < fen.Length) && (fen.Substring(idx,1) == " " || fen.Substring(idx, 1) == "-")) idx++;
 
             // Hash the en-passant. Only the player_to_move en-passant is stored.
 
@@ -565,7 +564,7 @@ namespace Chess.utils
 
             if ((idx < fen.Length) && RANK.Contains(fen[idx]))
             {
-                file = RANK.IndexOf(fen.Substring(idx, 1));
+                int file = RANK.IndexOf(fen.Substring(idx, 1));
 
                 key ^= Random64[RANDOM_EN_PASSANT + file];
 
@@ -614,13 +613,13 @@ namespace Chess.utils
 
                 // Form my understanding FILE can be optional, as only RANK is use.
                 // So this should cover both cases.
-                if ((idx + 1 < fen.Length) && FILE.Contains(fen.Substring(idx + 1,1)))
+                if ((idx + 1 < fen.Length) && FILE.Contains(fen[idx + 1]))
                 {
                     idx++;
                 }
 
-                idx++;
-            }
+                idx ++;
+            } 
 
             // If white is to move then "toMove" is the sole in RandomTurn.
             // Black is zero, so RandomTurn is not used.
@@ -631,36 +630,35 @@ namespace Chess.utils
             }
 
             // Walk over space more resilient implementation.
-            //while ((idx < fen.Length) && (fen[idx] == ' ' || fen[idx] == '-')) idx++;
-            while ((idx < fen.Length) && (fen.Substring(idx, 1) == " " || fen.Substring(idx, 1) == "-")) idx++;
+            while ((idx < fen.Length) && (fen[idx] == ' ' || fen[idx] == '-')) idx++;
 
             // OPTIONAL VALUES
 
             ///////////////////////////////////////////////////////////////////
             /// Fifty draw rule                                             ///
             ///////////////////////////////////////////////////////////////////
-            if (idx < fen.Length && NUMBERS.Contains(fen.Substring(idx,1)))
+            if (idx < fen.Length && NUMBERS.Contains(fen[idx]))
             {
                 // The number of moves since a capture or pawn move,
                 // used to handle the fifty move draw rule.
                 // Not used yet.
-                result.fiftyDrawRule = System.Convert.ToInt16(fen.Substring(idx,1));
+                result.fiftyDrawRule = System.Convert.ToInt16(fen[idx].ToString());
                 idx++;
             }
 
             // Walk over space more resilient implementation.
-            while ((idx < fen.Length) && (fen.Substring(idx, 1) == " " || fen.Substring(idx, 1) == "-")) idx++;
+            while ((idx < fen.Length) && (fen[idx] == ' ' || fen[idx] == '-')) idx++;
 
             ///////////////////////////////////////////////////////////////////
             /// Move                                                        ///
             ///////////////////////////////////////////////////////////////////
-            if (idx < fen.Length && NUMBERS.Contains(fen.Substring(idx,1)))
+            if (idx < fen.Length && NUMBERS.Contains(fen[idx]))
             {
                 // Not used yet.
-                result.moves = System.Convert.ToInt16(fen.Substring(idx, 1));
+                result.moves = System.Convert.ToInt16(fen[idx].ToString());
             }
 
-            result.hash = key;
+            result.hash = key; 
             return result;
         }
     }
