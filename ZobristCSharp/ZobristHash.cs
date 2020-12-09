@@ -457,8 +457,6 @@ namespace Chess.utils
             {
                 c = fen.Substring(idx, 1);
 
-                string NUMBERS = "123456789";
-
                 if (c == "/")
                 {
                     rank--;
