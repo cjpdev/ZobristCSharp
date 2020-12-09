@@ -451,21 +451,21 @@ namespace Chess.utils
             /// Get Board layout                                            ///
             //////////////////////////////////////////////////////////////////
 
-            string c;
+            string charactor;
 
-            while ((idx < fen.Length) && fen[idx] != ' ' && FEN.Contains(fen.Substring(idx, 1)))
+            while ((idx < fen.Length) && fen.Substring(idx,1) != " " && FEN.Contains(fen.Substring(idx, 1)))
             {
-                c = fen.Substring(idx, 1);
+                charactor = fen.Substring(idx, 1);
 
-                if (c == "/")
+                if (charactor == "/")
                 {
                     rank--;
                     file = 0;
                 }
                 //else if (('1' <= c) && ('8' >= c))
-                else if (NUMBERS.Contains(c))
+                else if (NUMBERS.Contains(charactor))
                 {
-                    int numberOf = NUMBERS.IndexOf(c);
+                    int numberOf = NUMBERS.IndexOf(charactor);
                     for (int i = 0; i <= numberOf; i++)
                     {
                         result.board[Position(rank, file)] = EMPTY;
@@ -475,13 +475,13 @@ namespace Chess.utils
                 }
                 else
                 {
-                    if (map.ContainsKey(c))
+                    if (map.ContainsKey(charactor))
                     {
-                        if (c == "K" || c == "k") { hasKings++; }
+                        if (charactor == "K" || charactor == "k") { hasKings++; }
 
-                        result.board[Position(rank, file)] = map[c][PIECE];
-                        result.color[Position(rank, file)] = map[c][COLOR];
-                        key ^= Random64[RANDOM_PIECE + 64 * map[c][VALUE] + 8 * rank + file];
+                        result.board[Position(rank, file)] = map[charactor][PIECE];
+                        result.color[Position(rank, file)] = map[charactor][COLOR];
+                        key ^= Random64[RANDOM_PIECE + 64 * map[charactor][VALUE] + 8 * rank + file];
                     }
 
                     squareCount++;
@@ -503,15 +503,15 @@ namespace Chess.utils
             }
 
             // Walk over space more resilient implementation.
-            while ((idx < fen.Length) && fen[idx] == ' ') idx++;
+            while ((idx < fen.Length) && fen.Substring(idx, 1) == " ") idx++;
 
             ///////////////////////////////////////////////////////////////////
             /// Find which players turn it is. This get hashed at the end.  ///
             ///////////////////////////////////////////////////////////////////
 
-            if ((idx < fen.Length) && (fen[idx] == 'w' || fen[idx] == 'b'))
+            if ((idx < fen.Length) && (fen.Substring(idx, 1) == "w" || fen.Substring(idx, 1) == "b"))
             {
-                result.turn = fen[idx].ToString();
+                result.turn = fen.Substring(idx, 1);
                 idx += 1;
             }
             else
@@ -520,12 +520,12 @@ namespace Chess.utils
             }
 
             // Walk over space more resilient implementation.
-            while (idx < fen.Length && fen[idx] == ' ') idx++;
+            while (idx < fen.Length && fen.Substring(idx, 1) == " ") idx++;
 
             ///////////////////////////////////////////////////////////////////
             /// Get castling.                                               ///
             ///////////////////////////////////////////////////////////////////
-            while ((idx < fen.Length) && fen[idx] != '-' && CASTLING.Contains(fen[idx]))
+            while ((idx < fen.Length) && fen.Substring(idx, 1) != "-" && CASTLING.Contains(fen.Substring(idx, 1)))
             {
                 /**
                 *   castle
@@ -535,9 +535,9 @@ namespace Chess.utils
                 *   black can castle short     2
                 *   black can castle long      3
                 */
-                c = fen.Substring(idx++, 1);
+                charactor = fen.Substring(idx++, 1);
 
-                switch (c)
+                switch (charactor)
                 {
                     case "K": key ^= Random64[RANDOM_CASTLE + 0]; break;
                     case "Q": key ^= Random64[RANDOM_CASTLE + 1]; break;
@@ -559,9 +559,8 @@ namespace Chess.utils
 
             // FILE is not need, as only the RANK is useful. Could use FILE to validate the FEN
             // But FILE can be optional, as only RANK is use.
-            // if ((idx + 1 < fen.Length) && (RANK.Contains(fen[idx]) && FILE.Contains(fen[idx+1])))
-
-            if ((idx < fen.Length) && RANK.Contains(fen[idx]))
+         
+            if ((idx < fen.Length) && RANK.Contains(fen.Substring(idx, 1)))
             {
                 file = RANK.IndexOf(fen.Substring(idx, 1));
 
@@ -629,7 +628,6 @@ namespace Chess.utils
             }
 
             // Walk over space more resilient implementation.
-            //while ((idx < fen.Length) && (fen[idx] == ' ' || fen[idx] == '-')) idx++;
             while ((idx < fen.Length) && (fen.Substring(idx, 1) == " " || fen.Substring(idx, 1) == "-")) idx++;
 
             // OPTIONAL VALUES
