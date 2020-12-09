@@ -341,12 +341,12 @@ namespace Chess.utils
             /// <returns></returns>
             public override string ToString()
             {
-                return BoardAsText(-1, -1, true);
+                return FenAsBoard(-1, -1, true);
             }
 
             /// <summary>
             /// Display the information generated when converting
-            /// the FEN to a Hash. Inlucding the board loayout.
+            /// and board layout for the input FEN 
             /// 
             /// If error(s) or warning(s) are reported then check the infoText List,
             /// as the board may not be valid.
@@ -359,12 +359,12 @@ namespace Chess.utils
             /// <param name="rankshow"></param>
             /// <param name="humanReadable"></param>
             /// <returns>string Board layout and info</returns>
-            public string BoardAsText(
+            public string FenAsBoard(
                 int fileShow,
                 int rankShow,
                 bool humanReadable = false)
             {
-                string textboard = "\n";
+                string textboard = "hash =[" +hash.ToString("X") +"]" + "\n";
                 if (turn != "")
                     textboard += "\tturn = " + turn + " | ";
                 else textboard += "\t";
