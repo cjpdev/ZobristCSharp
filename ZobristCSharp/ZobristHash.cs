@@ -307,7 +307,7 @@ namespace Chess.Utils
         private const int VALUE = 2;
 
         /// <summary>
-        /// Map for FEN to Board to HASH pice value.
+        /// Map for FEN to Board to HASH piece value.
         /// As piece and board are stored separatly in my chess engine.
         /// The Hash result is standard ZorbristHash.
         /// </summary>
