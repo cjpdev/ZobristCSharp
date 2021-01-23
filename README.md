@@ -1,5 +1,4 @@
 
-Copyright 2020 Chay Palton
 
 C# implementation of Zobrist Hash for FEN strings
 Used to lookup opening book moves for computer player in my chess program.
