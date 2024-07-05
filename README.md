@@ -9,7 +9,7 @@ from FEN formated string to a Zorbrist Hash, and than look it up to see if there
 This is a more robust implementation, as we don't want to generate rubish keys.
 Also I want error reporting to show problem in the FEN. 
 
-Software to be used with my chess game (Computer player lookup). 
+Initial implemented for a chess game I never released (Computer player lookup). 
 This is part of a pair of implementations the other being my PolyglotCSharp Hash, https://github.com/cjpdev/PolyglotCSharp
 
 The intergration test app is: https://github.com/cjpdev/ZobristPolyglotCSharp
