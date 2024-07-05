@@ -14,3 +14,4 @@ This is part of a pair of implementations the other being my PolyglotCSharp Hash
 
 The intergration test app is: https://github.com/cjpdev/ZobristPolyglotCSharp
 
+![alt text](splash_bw.png?raw=true)
